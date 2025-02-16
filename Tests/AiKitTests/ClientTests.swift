@@ -1,21 +1,22 @@
 import XCTest
 import NIOPosix
 import AsyncHTTPClient
-@testable import OpenAIKit
+@testable import AiKit
 
 final class ClientTests: XCTestCase {
-    
+
     private var httpClient: HTTPClient!
     private var client: Client!
     
     override func setUp() {
-        
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
         httpClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
         
-        let configuration = Configuration(apiKey: "YOUR-API-KEY")
-        
+//        let configuration = Configuration(apiKey: AiProvider.openAI.apiKey, api: AiProvider.openAI.api)
+        let configuration = Configuration(apiKey: AiProvider.xAI.apiKey, api: AiProvider.xAI.api)
+        //        let configuration = Configuration(apiKey: AiProvider.deepSeek.apiKey, api: AiProvider.deepSeek.api)
+
         client = Client(
             httpClient: httpClient,
             configuration: configuration
@@ -25,52 +26,12 @@ final class ClientTests: XCTestCase {
     override func tearDownWithError() throws {
         try httpClient.syncShutdown()
     }
-    
-    func test_error() async throws {
-        do {
-            _ = try await client.files.retrieve(id: "NOT-VALID-ID")
-        } catch {
-            print(error)
-        }
-        
-    }
-    
-    func test_listModels() async throws {
-        let models = try await client.models.list()
-        print(models)
-    }
-    
-    func test_retrieveModel() async throws {
-        let models = try await client.models.retrieve(id: Model.GPT3.davinci.id)
-        print(models)
-    }
-    
-    func test_gpt4Completion() async throws {
-        let messages: [Chat.Message] = [
-            .system(content: "You are a fairytale storyteller. Create a fairytale about the subject in the next message."),
-            .user(content: "a happy wolf in the forrest")
-        ]
-        
-        let completion = try await client.chats.create(
-            model: Model.GPT4.gpt4,
-            messages: messages
-        )
-        
-        print(completion)
-    }
-    
-    func test_createCompletion() async throws {
-        let completion = try await client.completions.create(
-            model: Model.GPT3.davinci,
-            prompts: ["Write a haiku"]
-        )
-        
-        print(completion)
-    }
-    
+
     func test_createChat() async throws {
+        print("start createChat")
         let completion = try await client.chats.create(
-            model: Model.GPT3.gpt3_5Turbo,
+//            model: Model.openAI.gpt,
+            model: Model.xAI.grok,
             messages: [
                 .user(content: "Write a haiki")
             ]
@@ -78,10 +39,12 @@ final class ClientTests: XCTestCase {
         
         print(completion)
     }
-    
+
+    /*
     func test_createChatStream() async throws {
+        print("start createChatStream")
         let stream = try await client.chats.stream(
-            model: Model.GPT3.gpt3_5Turbo,
+            model: Model.openAI.gpt,
             messages: [
                 .user(content: "Write a haiki")
             ]
@@ -94,6 +57,46 @@ final class ClientTests: XCTestCase {
         }        
     }
 
+    func test_completion() async throws {
+        let messages: [Chat.Message] = [
+            .system(content: "You are a fairytale storyteller. Create a fairytale about the subject in the next message under 100 words."),
+            .user(content: "a happy wolf in the forrest")
+        ]
+
+        let completion = try await client.chats.create(
+            model: Model.openAI.gpt,
+            messages: messages
+        )
+
+        print(completion)
+    }
+     */
+
+    /*
+
+    func test_createModeration() async throws {
+        let moderation = try await client.moderations.createModeration(input: "I want to kill them.")
+
+        print(moderation)
+    }
+
+    func test_listModels() async throws {
+        let models = try await client.models.list()
+        print(models)
+    }
+
+    func test_retrieveModel() async throws {
+        let models = try await client.models.retrieve(id: Model.GPT3.davinci.id)
+        print(models)
+    }
+
+    func test_error() async throws {
+        do {
+           _ = try await client.files.retrieve(id: "NOT-VALID-ID")
+        } catch {
+           print(error)
+        }
+    }
 
     func test_createEdit() async throws {
         let edit = try await client.edits.create(
@@ -103,7 +106,7 @@ final class ClientTests: XCTestCase {
         
         print(edit)
     }
-    
+
     func test_createImage() async throws {
         let image = try await client.images.create(prompt: "Tiger Woods eating soup")
         
@@ -164,15 +167,8 @@ final class ClientTests: XCTestCase {
         let response = try await client.files.delete(id: retrievedFile.id)
                 
         XCTAssertEqual(response.id, retrievedFile.id)
-        
     }
-    
-    func test_createModeration() async throws {
-        let moderation = try await client.moderations.createModeration(input: "I want to kill them.")
-        
-        print(moderation)
-    }
-    
+
     func test_createTranscription() async throws {
         let url = Bundle.module.url(forResource: "9000", withExtension: "mp3")!
         
@@ -201,5 +197,5 @@ final class ClientTests: XCTestCase {
         
         print(translation)
     }
-    
+     */
 }

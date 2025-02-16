@@ -51,6 +51,7 @@ struct NIORequestHandler: RequestHandler {
         do {
             return try decoder.decode(T.self, from: byteBuffer)
         } catch {
+            print(error.localizedDescription.debugDescription)
             throw try decoder.decode(APIErrorResponse.self, from: byteBuffer)
         }
     }

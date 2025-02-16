@@ -1,6 +1,8 @@
-# OpenAIKit
+# AiKit
 
 ![Swift](http://img.shields.io/badge/swift-5.7-brightgreen.svg)
+
+AiKit is based on OpenAIKit, synced from it on Feb 17, 2025. This aims to expand support to DeepSeek & Grok
 
 OpenAIKit is a Swift package used to communicate with the [OpenAI API](https://beta.openai.com/docs/api-reference/introduction).
 
@@ -10,11 +12,11 @@ Add the dependency to Package.swift:
 ~~~~swift
 dependencies: [
     ...
-    .package(url: "https://github.com/dylanshine/openai-kit.git", from: "1.0.0")
+    .package(url: "https://github.com/dylanshine/AiKit.git", from: "1.0.0")
 ],
 targets: [
     .target(name: "App", dependencies: [
-        .product(name: "OpenAIKit", package: "openai-kit"),
+        .product(name: "AiKit", package: "AiKit"),
     ]),
 ~~~~
 
@@ -28,7 +30,7 @@ OPENAI_ORGANIZATION="YOUR-ORGANIZATION"
 ~~~~
 ⚠️ OpenAI strongly recommends developers of client-side applications proxy requests through a separate backend service to keep their API key safe. API keys can access and manipulate customer billing, usage, and organizational data, so it's a significant risk to [expose](https://nshipster.com/secrets/) them.
 
-Create a `OpenAIKit.Client` by passing a configuration.
+Create a `AiKit.Client` by passing a configuration.
 
 ~~~~swift
 
@@ -55,7 +57,7 @@ defer {
 
 let configuration = Configuration(apiKey: apiKey, organization: organization)
 
-let openAIClient = OpenAIKit.Client(httpClient: httpClient, configuration: configuration)
+let openAIClient = AiKit.Client(httpClient: httpClient, configuration: configuration)
 
 ~~~~
 
@@ -64,15 +66,15 @@ If you don't want to use SwiftNIO you can use URLSession.
 ~~~~swift
 let urlSession = URLSession(configuration: .default)
 let configuration = Configuration(apiKey: apiKey, organization: organization)
-let openAIClient = OpenAIKit.Client(session: urlSession, configuration: configuration)
+let openAIClient = AiKit.Client(session: urlSession, configuration: configuration)
 ~~~~
 
 ## Using the API
 
-The OpenAIKit.Client implements a handful of methods to interact with the OpenAI API:
+The AiKit.Client implements a handful of methods to interact with the OpenAI API:
 
 ~~~~swift
-import OpenAIKit
+import AiKit
 
 let completion = try await openAIClient.completions.create(
     model: Model.GPT3.davinci,
@@ -95,7 +97,7 @@ let completion = try await openAIClient.completions.create(
 
 
 ## Error handling
-If the request to the API failed for any reason an `OpenAIKit.APIErrorResponse` is `thrown`.
+If the request to the API failed for any reason an `AiKit.APIErrorResponse` is `thrown`.
 Simply ensure you catch errors thrown like any other throwing function
 
 ~~~~swift

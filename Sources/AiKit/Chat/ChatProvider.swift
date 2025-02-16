@@ -15,7 +15,7 @@ public struct ChatProvider {
      Creates a chat completion for the provided prompt and parameters
      */
     public func create(
-        model: ModelID,
+        model: ModelId,
         messages: [Chat.Message] = [],
         temperature: Double = 1.0,
         topP: Double = 1.0,
@@ -61,7 +61,7 @@ public struct ChatProvider {
      https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format
      */
     public func stream(
-        model: ModelID,
+        model: ModelId,
         messages: [Chat.Message] = [],
         temperature: Double = 1.0,
         topP: Double = 1.0,

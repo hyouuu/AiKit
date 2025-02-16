@@ -5,7 +5,7 @@
 //  Created by Ronald Mannak on 3/6/23.
 //
 import XCTest
-@testable import OpenAIKit
+@testable import AiKit
 
 final class MessageTests: XCTestCase {
 

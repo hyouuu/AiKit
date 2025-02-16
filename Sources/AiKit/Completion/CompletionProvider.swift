@@ -15,7 +15,7 @@ public struct CompletionProvider {
      Creates a completion for the provided prompt and parameters
      */
     public func create(
-        model: ModelID,
+        model: ModelId,
         prompts: [String] = [],
         suffix: String? = nil,
         maxTokens: Int = 16,

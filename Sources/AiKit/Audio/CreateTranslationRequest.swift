@@ -25,7 +25,7 @@ struct CreateTranslationRequest: Request {
         file: Data,
         fileName: String,
         mimeType: MIMEType.Audio,
-        model: ModelID,
+        model: ModelId,
         prompt: String?,
         responseFormat: String?,
         temperature: Double?

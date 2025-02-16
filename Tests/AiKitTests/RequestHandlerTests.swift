@@ -2,7 +2,7 @@ import XCTest
 import NIOHTTP1
 import NIOPosix
 import AsyncHTTPClient
-@testable import OpenAIKit
+@testable import AiKit
 
 final class RequestHandlerTests: XCTestCase {
     

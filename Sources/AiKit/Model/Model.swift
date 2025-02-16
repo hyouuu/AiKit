@@ -30,23 +30,28 @@ extension Model {
     }
 }
 
-public protocol ModelID {
+public protocol ModelId {
     var id: String { get }
 }
 
 extension Model {
-    public enum GPT4: String, ModelID {
-        case gpt4 = "gpt-4"
-        case gpt40314 = "gpt-4-0314"
-        case gpt4_32k = "gpt-4-32k"
-        case gpt4_32k0314 = "gpt-4-32k-0314"
-        case gpt_4o = "gpt-4o"
-        case gpt_4o_0513 = "gpt-4o-2024-05-13"
-        case gpt_4o_mini = "gpt-4o-mini"
-        case gpt_4o_mini_0718 = "gpt-4o-mini-2024-07-18"
+    public enum xAI: String, ModelId {
+        // https://docs.x.ai/docs/models
+        case grok = "grok-2-1212"
     }
 
-    public enum GPT3: String, ModelID {
+    public enum openAI: String, ModelId {
+        // https://openai.com/api/pricing/
+        case gpt = "gpt-4o-mini"
+    }
+
+    public enum deepSeek: String, ModelId {
+        // https://api-docs.deepseek.com/quick_start/pricing
+        case deepSeek = "deepseek-chat"
+    }
+
+    // Used for edits etc 
+    public enum GPT3: String, ModelId {
         case gpt3_5Turbo = "gpt-3.5-turbo"
         case gpt3_5Turbo16K = "gpt-3.5-turbo-16k"
         case gpt3_5Turbo0301 = "gpt-3.5-turbo-0301"
@@ -66,14 +71,14 @@ extension Model {
         case babbage
     }
 
-    public enum Codex: String, ModelID {
+    public enum Codex: String, ModelId {
         case codeDavinci002 = "code-davinci-002"
         case codeCushman001 = "code-cushman-001"
         case codeDavinci001 = "code-davinci-001"
         case codeDavinciEdit001 = "code-davinci-edit-001"
     }
 
-    public enum Whisper: String, ModelID {
+    public enum Whisper: String, ModelId {
         case whisper1 = "whisper-1"
     }
 }
