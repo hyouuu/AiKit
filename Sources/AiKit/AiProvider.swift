@@ -8,7 +8,7 @@
 public enum AiProvider: String {
     case openAI, xAI, deepSeek
 
-    var api: AiKit.API? {
+    public var api: AiKit.API? {
         switch self {
             case .openAI: return nil
             case .xAI: return API(scheme: .https, host: "api.x.ai")
@@ -16,7 +16,7 @@ public enum AiProvider: String {
         }
     }
 
-    var modelId: ModelId {
+    public var modelId: ModelId {
         switch self {
             case .openAI: Model.openAI.gpt
             case .xAI: Model.xAI.grok
