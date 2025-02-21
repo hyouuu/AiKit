@@ -43,6 +43,7 @@ extension Model {
     public enum openAI: String, ModelId {
         // https://openai.com/api/pricing/
         case gpt = "gpt-4o-mini"
+        case o3 = "o3-mini"
     }
 
     public enum deepSeek: String, ModelId {
