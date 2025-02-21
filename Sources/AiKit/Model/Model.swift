@@ -48,7 +48,8 @@ extension Model {
 
     public enum deepSeek: String, ModelId {
         // https://api-docs.deepseek.com/quick_start/pricing
-        case deepSeek = "deepseek-chat"
+        case chat = "deepseek-chat"
+        case reasoner = "deepseek-reasoner"
     }
 
     // Used for edits etc 

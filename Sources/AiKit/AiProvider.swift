@@ -16,11 +16,19 @@ public enum AiProvider: String {
         }
     }
 
-    public var modelId: ModelId {
+    public var chatModel: ModelId {
         switch self {
             case .openAI: Model.openAI.gpt
             case .xAI: Model.xAI.grok
-            case .deepSeek: Model.deepSeek.deepSeek
+            case .deepSeek: Model.deepSeek.chat
+        }
+    }
+
+    public var reasoningModel: ModelId {
+        switch self {
+            case .openAI: Model.openAI.o3
+            case .xAI: Model.xAI.grok
+            case .deepSeek: Model.deepSeek.reasoner
         }
     }
 }
