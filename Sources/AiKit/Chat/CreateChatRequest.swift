@@ -45,9 +45,9 @@ extension CreateChatRequest {
     struct Body: Encodable {
         let model: String
         let messages: [Chat.Message]
-        let temperature: Double
-        let topP: Double
-        let n: Int
+        let temperature: Double?
+        let topP: Double?
+        let n: Int?
         let stream: Bool
         let stops: [String]
         let maxTokens: Int?
