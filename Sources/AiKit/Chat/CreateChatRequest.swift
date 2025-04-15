@@ -10,14 +10,14 @@ struct CreateChatRequest: Request {
     init(
         model: String,
         messages: [Chat.Message],
-        temperature: Double,
-        topP: Double,
-        n: Int,
+        temperature: Double?,
+        topP: Double?,
+        n: Int?,
         stream: Bool,
         stops: [String],
         maxTokens: Int?,
-        presencePenalty: Double,
-        frequencyPenalty: Double,
+        presencePenalty: Double?,
+        frequencyPenalty: Double?,
         logitBias: [String: Int],
         user: String?
     ) throws {
@@ -51,8 +51,8 @@ extension CreateChatRequest {
         let stream: Bool
         let stops: [String]
         let maxTokens: Int?
-        let presencePenalty: Double
-        let frequencyPenalty: Double
+        let presencePenalty: Double?
+        let frequencyPenalty: Double?
         let logitBias: [String: Int]
         let user: String?
             
@@ -79,9 +79,15 @@ extension CreateChatRequest {
                 try container.encode(messages, forKey: .messages)
             }
 
-            try container.encode(temperature, forKey: .temperature)
-            try container.encode(topP, forKey: .topP)
-            try container.encode(n, forKey: .n)
+            if let temperature {
+                try container.encode(temperature, forKey: .temperature)
+            }
+            if let topP {
+                try container.encode(topP, forKey: .topP)
+            }
+            if let n {
+                try container.encode(n, forKey: .n)
+            }
             try container.encode(stream, forKey: .stream)
             
             if !stops.isEmpty {
@@ -91,10 +97,15 @@ extension CreateChatRequest {
             if let maxTokens {
                 try container.encode(maxTokens, forKey: .maxTokens)
             }
-            
-            try container.encode(presencePenalty, forKey: .presencePenalty)
-            try container.encode(frequencyPenalty, forKey: .frequencyPenalty)
-            
+
+            if let presencePenalty {
+                try container.encode(presencePenalty, forKey: .presencePenalty)
+            }
+
+            if let frequencyPenalty {
+                try container.encode(frequencyPenalty, forKey: .frequencyPenalty)
+            }
+
             if !logitBias.isEmpty {
                 try container.encode(logitBias, forKey: .logitBias)
             }

@@ -13,9 +13,9 @@ final class ClientTests: XCTestCase {
 
         httpClient = HTTPClient(eventLoopGroupProvider: .shared(eventLoopGroup))
         
-//        let configuration = Configuration(apiKey: AiProvider.openAI.apiKey, api: AiProvider.openAI.api)
+        let configuration = Configuration(apiKey: AiProvider.openAI.apiKey, api: AiProvider.openAI.api)
 //        let configuration = Configuration(apiKey: AiProvider.xAI.apiKey, api: AiProvider.xAI.api)
-        let configuration = Configuration(apiKey: AiProvider.deepSeek.apiKey, api: AiProvider.deepSeek.api)
+//        let configuration = Configuration(apiKey: AiProvider.deepSeek.apiKey, api: AiProvider.deepSeek.api)
 
         client = Client(
             httpClient: httpClient,
@@ -30,11 +30,11 @@ final class ClientTests: XCTestCase {
     func test_createChat() async throws {
         print("start createChat")
         let completion = try await client.chats.create(
-//            model: Model.openAI.gpt,
+            model: Model.openAI.gpt,
 //            model: Model.openAI.o3,
 //            model: Model.xAI.grok,
 //            model: Model.deepSeek.chat,
-            model: Model.deepSeek.reasoner,
+//            model: Model.deepSeek.reasoner,
             messages: [ .user(content: "Write a haiki") ]
         )
         

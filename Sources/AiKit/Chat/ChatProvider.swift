@@ -17,13 +17,13 @@ public struct ChatProvider {
     public func create(
         model: ModelId,
         messages: [Chat.Message] = [],
-        temperature: Double = 1.0,
-        topP: Double = 1.0,
-        n: Int = 1,
+        temperature: Double? = nil,
+        topP: Double? = nil,
+        n: Int? = nil,
         stops: [String] = [],
         maxTokens: Int? = nil,
-        presencePenalty: Double = 0.0,
-        frequencyPenalty: Double = 0.0,
+        presencePenalty: Double? = nil,
+        frequencyPenalty: Double? = nil,
         logitBias: [String : Int] = [:],
         user: String? = nil
     ) async throws -> Chat {
@@ -63,13 +63,13 @@ public struct ChatProvider {
     public func stream(
         model: ModelId,
         messages: [Chat.Message] = [],
-        temperature: Double = 1.0,
-        topP: Double = 1.0,
-        n: Int = 1,
+        temperature: Double? = nil,
+        topP: Double? = nil,
+        n: Int? = nil,
         stops: [String] = [],
         maxTokens: Int? = nil,
-        presencePenalty: Double = 0.0,
-        frequencyPenalty: Double = 0.0,
+        presencePenalty: Double? = nil,
+        frequencyPenalty: Double? = nil,
         logitBias: [String : Int] = [:],
         user: String? = nil
     ) async throws -> AsyncThrowingStream<ChatStream, Error> {

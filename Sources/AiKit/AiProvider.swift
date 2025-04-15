@@ -6,13 +6,14 @@
 //
 
 public enum AiProvider: String {
-    case openAI, xAI, deepSeek
+    case openAI, xAI, deepSeek //, google
 
     public var api: AiKit.API? {
         switch self {
             case .openAI: return nil
             case .xAI: return API(scheme: .https, host: "api.x.ai")
             case .deepSeek: return API(scheme: .https, host: "api.deepseek.com")
+//            case .google: return API(scheme: .https, host: "generativelanguage.googleapis.com/v1beta/openai")
         }
     }
 
@@ -21,6 +22,7 @@ public enum AiProvider: String {
             case .openAI: Model.openAI.gpt
             case .xAI: Model.xAI.grok
             case .deepSeek: Model.deepSeek.chat
+//            case .google: Model.deepSeek.chat
         }
     }
 
@@ -29,6 +31,7 @@ public enum AiProvider: String {
             case .openAI: Model.openAI.o3
             case .xAI: Model.xAI.grok
             case .deepSeek: Model.deepSeek.reasoner
+//            case .google: Model.deepSeek.reasoner
         }
     }
 }

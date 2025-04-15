@@ -37,12 +37,14 @@ public protocol ModelId {
 extension Model {
     public enum xAI: String, ModelId {
         // https://docs.x.ai/docs/models
-        case grok = "grok-2-1212"
+        case grok = "grok-3-mini"
     }
 
     public enum openAI: String, ModelId {
         // https://openai.com/api/pricing/
-        case gpt = "gpt-4o-mini"
+        // https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat
+//        case gpt = "gpt-4o-mini"
+        case gpt = "gpt-4o-mini-search-preview"
         case o3 = "o3-mini"
     }
 
