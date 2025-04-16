@@ -2,7 +2,7 @@ import AsyncHTTPClient
 import NIOHTTP1
 import Foundation
 
-public protocol Request: Sendable {
+protocol Request: Sendable {
     var method: HTTPMethod { get }
     var scheme: API.Scheme { get }
     var host: String { get }

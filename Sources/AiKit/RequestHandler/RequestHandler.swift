@@ -2,7 +2,7 @@ import Foundation
 import AsyncHTTPClient
 import NIOHTTP1
 
-public protocol RequestHandler: Sendable {
+protocol RequestHandler: Sendable {
     var configuration: Configuration { get }
     
     func perform<T: Decodable>(request: Request) async throws -> T
