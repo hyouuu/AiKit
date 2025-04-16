@@ -19,13 +19,28 @@ struct NIORequestHandler: RequestHandler {
         self.decoder = decoder
     }
     
+    func generateURL(for request: Request) throws -> String {
+        var components = URLComponents()
+        components.scheme = configuration.api?.scheme.value ?? request.scheme.value
+        components.host = configuration.api?.host ?? request.host
+        components.path = [configuration.api?.path, request.path]
+            .compactMap { $0 }
+            .joined()
+            
+        guard let url = components.url else {
+            throw RequestHandlerError.invalidURLGenerated
+        }
+    
+        return url.absoluteString
+    }
+    
     func perform<T: Decodable>(request: Request) async throws -> T {
         var headers = configuration.headers
         
         headers.add(contentsOf: request.headers)
         
-        let url = try generateURL(for: request)
-        
+        let url = try request.generateURL(configuration)
+
         let body: HTTPClient.Body? = {
             guard let data = request.body else { return nil }
             return .data(data)
@@ -58,8 +73,8 @@ struct NIORequestHandler: RequestHandler {
     
     func stream<T: Decodable>(request: Request) async throws -> AsyncThrowingStream<T, Error> {
         
-        let url = try generateURL(for: request)
-        
+        let url = try request.generateURL(configuration)
+
         var httpClientRequest = HTTPClientRequest(url: url)
         
         httpClientRequest.headers.add(contentsOf: configuration.headers)
@@ -76,20 +91,26 @@ struct NIORequestHandler: RequestHandler {
         
         let response = try await httpClient.execute(httpClientRequest, timeout: .seconds(25))
         
-        return AsyncThrowingStream<T, Error> { continuation in
+        return AsyncThrowingStream<T, Error> { @Sendable continuation in
             Task(priority: .userInitiated) {
                 do {
                     for try await buffer in response.body {
-                        String(buffer: buffer)
+                        let components = String(buffer: buffer)
                             .components(separatedBy: "data: ")
                             .filter { $0 != "data: " }
-                            .compactMap {
-                                guard let data = $0.data(using: .utf8) else { return nil }
-                                return try? decoder.decode(T.self, from: data)
+                        
+                        await withTaskGroup(of: Void.self) { group in
+                            for component in components {
+                                let localComponent = component // Capture in a local constant
+                                group.addTask { @Sendable in
+                                    guard let data = localComponent.data(using: .utf8),
+                                          let value = try? self.decoder.decode(T.self, from: data) else {
+                                        return
+                                    }
+                                    continuation.yield(value)
+                                }
                             }
-                            .forEach { value in
-                                continuation.yield(value)
-                            }
+                        }
                     }
                     continuation.finish()
                 } catch {
@@ -98,5 +119,4 @@ struct NIORequestHandler: RequestHandler {
             }
         }
     }
-
 }

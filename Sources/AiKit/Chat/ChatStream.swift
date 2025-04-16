@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ChatStream {
+public struct ChatStream: Codable, Sendable {
     public let id: String
     public let object: String
     public let created: Date
@@ -8,25 +8,19 @@ public struct ChatStream {
     public let choices: [ChatStream.Choice]
 }
 
-extension ChatStream: Codable {}
-
 extension ChatStream {
-    public struct Choice {
+    public struct Choice: Codable, Sendable {
         public let index: Int
         public let finishReason: FinishReason?
         public let delta: ChatStream.Choice.Message
     }
 }
 
-extension ChatStream.Choice: Codable {}
-
 extension ChatStream.Choice {
-    public struct Message {
+    public struct Message: Codable, Sendable {
         public let content: String?
         public let role: String?
     }
 }
-
-extension ChatStream.Choice.Message: Codable {}
 
 

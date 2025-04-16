@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Usage {
+public struct Usage: Sendable {
     public let promptTokens: Int
     public let completionTokens: Int?
     public let totalTokens: Int

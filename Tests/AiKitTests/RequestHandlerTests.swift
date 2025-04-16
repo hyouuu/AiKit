@@ -32,8 +32,8 @@ final class RequestHandlerTests: XCTestCase {
             path: "/v1/i-know"
         )
         
-        let url = try requestHandler(configuration: configuration).generateURL(for: request)
-        
+        let url = try request.generateURL(configuration)
+
         XCTAssertEqual(url, "openai://chatgpt.is.cool/v1/i-know")
     }
     
@@ -47,7 +47,7 @@ final class RequestHandlerTests: XCTestCase {
             path: "/v1/test"
         )
         
-        let url = try requestHandler(configuration: configuration).generateURL(for: request)
+        let url = try request.generateURL(configuration)
         
         XCTAssertEqual(url, "http://chat.openai.com/v1/test")
     }

@@ -29,27 +29,36 @@ struct URLSessionRequestHandler: RequestHandler {
     }
     
     func stream<T>(request: Request) async throws -> AsyncThrowingStream<T, Error> where T : Decodable {
-        var urlRequest = try makeUrlRequest(request: request)
-        urlRequest.timeoutInterval = 25
+        let urlRequest = try makeUrlRequest(request: request)
+        let finalRequest: URLRequest = {
+            var request = urlRequest
+            request.timeoutInterval = 25
+            return request
+        }()
+        
         decoder.keyDecodingStrategy = request.keyDecodingStrategy
         decoder.dateDecodingStrategy = request.dateDecodingStrategy
         
-        return AsyncThrowingStream<T, Error> { [urlRequest] continuation in
+        return AsyncThrowingStream<T, Error> { @Sendable continuation in
             Task(priority: .userInitiated) {
                 do {
-                    
-                    let (bytes, _) = try await session.bytes(for: urlRequest)
+                    let (bytes, _) = try await session.bytes(for: finalRequest)
                     for try await buffer in bytes.lines {
-                        buffer
-                            .components(separatedBy: "data: ")
+                        let components = buffer.components(separatedBy: "data: ")
                             .filter { $0 != "data: " }
-                            .compactMap {
-                                guard let data = $0.data(using: .utf8) else { return nil }
-                                return try? decoder.decode(T.self, from: data)
+                        
+                        await withTaskGroup(of: Void.self) { group in
+                            for component in components {
+                                let localComponent = component // Capture in a local constant
+                                group.addTask { @Sendable in
+                                    guard let data = localComponent.data(using: .utf8),
+                                          let value = try? self.decoder.decode(T.self, from: data) else {
+                                        return
+                                    }
+                                    continuation.yield(value)
+                                }
                             }
-                            .forEach { value in
-                                continuation.yield(value)
-                            }
+                        }
                     }
                     continuation.finish()
                 } catch {
@@ -60,7 +69,7 @@ struct URLSessionRequestHandler: RequestHandler {
     }
     
     private func makeUrlRequest(request: Request) throws -> URLRequest {
-        let urlString = try generateURL(for: request)
+        let urlString = try request.generateURL(configuration)
         guard let url = URL(string: urlString) else {
             throw RequestHandlerError.invalidURLGenerated
         }

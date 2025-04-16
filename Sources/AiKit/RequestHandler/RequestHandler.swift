@@ -1,10 +1,14 @@
 import Foundation
+import AsyncHTTPClient
+import NIOHTTP1
 
-
-protocol RequestHandler {
+public protocol RequestHandler: Sendable {
     var configuration: Configuration { get }
+    
     func perform<T: Decodable>(request: Request) async throws -> T
     func stream<T: Decodable>(request: Request) async throws -> AsyncThrowingStream<T, Error>
+    
+    func generateURL(for request: Request) throws -> String
 }
 
 extension RequestHandler {

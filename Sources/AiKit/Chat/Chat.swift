@@ -3,7 +3,7 @@ import Foundation
 /**
  Given a prompt, the model will return one or more predicted chat completions, and can also return the probabilities of alternative tokens at each position.
  */
-public struct Chat {
+public struct Chat: Codable, Sendable {
     public let id: String
     public let object: String
     public let created: Date
@@ -12,20 +12,16 @@ public struct Chat {
     public let usage: Usage
 }
 
-extension Chat: Codable {}
-
 extension Chat {
-    public struct Choice {
+    public struct Choice: Codable, Sendable {
         public let index: Int
         public let message: Message
         public let finishReason: FinishReason?
     }
 }
 
-extension Chat.Choice: Codable {}
-
 extension Chat {
-    public enum Message {
+    public enum Message: Sendable {
         case system(content: String)
         case user(content: String)
         case assistant(content: String)
