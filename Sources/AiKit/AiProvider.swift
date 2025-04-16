@@ -5,7 +5,7 @@
 //  Created by hyouuu on 2/17/25.
 //
 
-public enum AiProvider: String {
+public enum AiProvider: String, Sendable {
     case openAI, xAI, deepSeek //, google
 
     public var api: AiKit.API? {
