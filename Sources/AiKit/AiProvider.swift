@@ -28,7 +28,7 @@ public enum AiProvider: String, Sendable {
 
     public var reasoningModel: ModelId {
         switch self {
-            case .openAI: Model.openAI.o3
+            case .openAI: Model.openAI.o4
             case .xAI: Model.xAI.grok
             case .deepSeek: Model.deepSeek.reasoner
 //            case .google: Model.deepSeek.reasoner

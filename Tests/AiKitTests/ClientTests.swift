@@ -31,7 +31,7 @@ final class ClientTests: XCTestCase {
         print("start createChat")
         let completion = try await client.chats.create(
             model: Model.openAI.gpt,
-//            model: Model.openAI.o3,
+//            model: Model.openAI.o4,
 //            model: Model.xAI.grok,
 //            model: Model.deepSeek.chat,
 //            model: Model.deepSeek.reasoner,
