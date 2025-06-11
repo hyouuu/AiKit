@@ -46,7 +46,8 @@ final class ClientTests: XCTestCase {
         let stream = try await client.chats.stream(
             model: Model.openAI.gpt,
             messages: [
-                .user(content: "Write a haiki")
+//                .user(content: "Write a haiki")
+                .user(content: "What should parents pay attention to on day 13 for a newborn ")
             ]
         )
         

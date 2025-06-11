@@ -99,17 +99,13 @@ struct NIORequestHandler: RequestHandler {
                             .components(separatedBy: "data: ")
                             .filter { $0 != "data: " }
                         
-                        await withTaskGroup(of: Void.self) { group in
-                            for component in components {
-                                let localComponent = component // Capture in a local constant
-                                group.addTask { @Sendable in
-                                    guard let data = localComponent.data(using: .utf8),
-                                          let value = try? self.decoder.decode(T.self, from: data) else {
-                                        return
-                                    }
-                                    continuation.yield(value)
-                                }
+                        // Process components sequentially to maintain order
+                        for component in components {
+                            guard let data = component.data(using: .utf8),
+                                  let value = try? self.decoder.decode(T.self, from: data) else {
+                                continue
                             }
+                            continuation.yield(value)
                         }
                     }
                     continuation.finish()
