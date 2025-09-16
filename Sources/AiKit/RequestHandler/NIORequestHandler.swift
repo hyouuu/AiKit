@@ -71,7 +71,7 @@ struct NIORequestHandler: RequestHandler {
         }
     }
     
-    func stream<T: Decodable>(request: Request) async throws -> AsyncThrowingStream<T, Error> {
+    func stream<T: Decodable & Sendable>(request: Request) async throws -> AsyncThrowingStream<T, Error> {
         
         let url = try request.generateURL(configuration)
 
@@ -86,12 +86,15 @@ struct NIORequestHandler: RequestHandler {
             httpClientRequest.body = .bytes(body)
         }
         
-        decoder.keyDecodingStrategy = request.keyDecodingStrategy
-        decoder.dateDecodingStrategy = request.dateDecodingStrategy
+        // Create a local decoder to avoid crossing concurrency domains with self.decoder
+        let localDecoder = JSONDecoder()
+
+        localDecoder.keyDecodingStrategy = request.keyDecodingStrategy
+        localDecoder.dateDecodingStrategy = request.dateDecodingStrategy
         
         let response = try await httpClient.execute(httpClientRequest, timeout: .seconds(25))
         
-        return AsyncThrowingStream<T, Error> { @Sendable continuation in
+        return AsyncThrowingStream<T, Error> { @Sendable [localDecoder] continuation in
             Task(priority: .userInitiated) {
                 do {
                     for try await buffer in response.body {
@@ -102,7 +105,7 @@ struct NIORequestHandler: RequestHandler {
                         // Process components sequentially to maintain order
                         for component in components {
                             guard let data = component.data(using: .utf8),
-                                  let value = try? self.decoder.decode(T.self, from: data) else {
+                                  let value = try? localDecoder.decode(T.self, from: data) else {
                                 continue
                             }
                             continuation.yield(value)
@@ -116,3 +119,4 @@ struct NIORequestHandler: RequestHandler {
         }
     }
 }
+

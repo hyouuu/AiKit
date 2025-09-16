@@ -41,11 +41,9 @@ extension Model {
     }
 
     public enum openAI: String, ModelId {
-        // https://openai.com/api/pricing/
+        // https://platform.openai.com/docs/pricing
         // https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat
-        case gpt = "gpt-4.1-mini"
-        case o4 = "o4-mini"
-        case o3 = "o3-mini" // Deprecated - same price of o4
+        case gpt = "gpt-5-mini"
     }
 
     public enum deepSeek: String, ModelId {

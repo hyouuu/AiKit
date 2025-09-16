@@ -19,8 +19,7 @@ extension Moderation {
     }
     
     public enum Model: String, Codable {
-        case latest = "text-moderation-latest"
-        case stable = "text-moderation-stable"
+        case stable = "omni-moderation-latest"
     }
 }
 

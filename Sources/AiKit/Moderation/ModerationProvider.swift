@@ -10,20 +10,20 @@ public struct ModerationProvider: Sendable {
      Create moderation
      POST
       
-     https://api.openai.com/v1/moderations
-
+     https://platform.openai.com/docs/models/omni-moderation-latest
+     
      Classifies if text violates OpenAI's Content Policy
      */
     public func createModeration(
         input: String,
-        model: Moderation.Model = .latest
+        model: Moderation.Model = .stable
     ) async throws -> Moderation {
         
         let request = try CreateModerationRequest(
             input: input,
             model: model
         )
-        
+
         return try await requestHandler.perform(request: request)
     }
 }

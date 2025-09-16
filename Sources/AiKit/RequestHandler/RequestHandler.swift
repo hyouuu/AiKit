@@ -6,7 +6,7 @@ protocol RequestHandler: Sendable {
     var configuration: Configuration { get }
     
     func perform<T: Decodable>(request: Request) async throws -> T
-    func stream<T: Decodable>(request: Request) async throws -> AsyncThrowingStream<T, Error>
+    func stream<T: Decodable & Sendable>(request: Request) async throws -> AsyncThrowingStream<T, Error>
     
     func generateURL(for request: Request) throws -> String
 }

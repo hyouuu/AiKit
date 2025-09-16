@@ -28,7 +28,7 @@ struct URLSessionRequestHandler: RequestHandler {
         }
     }
     
-    func stream<T>(request: Request) async throws -> AsyncThrowingStream<T, Error> where T : Decodable {
+    func stream<T>(request: Request) async throws -> AsyncThrowingStream<T, Error> where T : Decodable & Sendable {
         let urlRequest = try makeUrlRequest(request: request)
         let finalRequest: URLRequest = {
             var request = urlRequest
@@ -36,28 +36,25 @@ struct URLSessionRequestHandler: RequestHandler {
             return request
         }()
         
-        decoder.keyDecodingStrategy = request.keyDecodingStrategy
-        decoder.dateDecodingStrategy = request.dateDecodingStrategy
+        // Use a local decoder to avoid crossing concurrency domains with self.decoder
+        let localDecoder = JSONDecoder()
+        localDecoder.keyDecodingStrategy = request.keyDecodingStrategy
+        localDecoder.dateDecodingStrategy = request.dateDecodingStrategy
         
-        return AsyncThrowingStream<T, Error> { @Sendable continuation in
+        return AsyncThrowingStream<T, Error> { @Sendable [localDecoder] continuation in
             Task(priority: .userInitiated) {
                 do {
                     let (bytes, _) = try await session.bytes(for: finalRequest)
                     for try await buffer in bytes.lines {
                         let components = buffer.components(separatedBy: "data: ")
                             .filter { $0 != "data: " }
-                        
-                        await withTaskGroup(of: Void.self) { group in
-                            for component in components {
-                                let localComponent = component // Capture in a local constant
-                                group.addTask { @Sendable in
-                                    guard let data = localComponent.data(using: .utf8),
-                                          let value = try? self.decoder.decode(T.self, from: data) else {
-                                        return
-                                    }
-                                    continuation.yield(value)
-                                }
+                        // Process sequentially to keep ordering and avoid data races
+                        for component in components {
+                            guard let data = component.data(using: .utf8),
+                                  let value = try? localDecoder.decode(T.self, from: data) else {
+                                continue
                             }
+                            continuation.yield(value)
                         }
                     }
                     continuation.finish()
