@@ -27,6 +27,12 @@ final class ClientTests: XCTestCase {
         try httpClient.syncShutdown()
     }
 
+    func test_createModeration() async throws {
+        let moderation = try await client.moderations.createModeration(input: "I want to kill them.")
+
+        print(moderation)
+    }
+    
     func test_createChat() async throws {
         print("start createChat")
         let completion = try await client.chats.create(
@@ -76,11 +82,7 @@ final class ClientTests: XCTestCase {
 
     /*
 
-    func test_createModeration() async throws {
-        let moderation = try await client.moderations.createModeration(input: "I want to kill them.")
 
-        print(moderation)
-    }
 
     func test_listModels() async throws {
         let models = try await client.models.list()

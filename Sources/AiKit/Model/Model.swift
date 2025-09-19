@@ -41,9 +41,12 @@ extension Model {
     }
 
     public enum openAI: String, ModelId {
+        // Starting from gpt-5-mini, need to migrate using:
+        // https://platform.openai.com/docs/guides/migrate-to-responses
+
         // https://platform.openai.com/docs/pricing
         // https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat
-        case gpt = "gpt-5-mini"
+        case gpt = "gpt-4.1-mini"
     }
 
     public enum deepSeek: String, ModelId {

@@ -5,7 +5,7 @@ struct URLSessionRequestHandler: RequestHandler {
     let session: URLSession
     let configuration: Configuration
     let decoder: JSONDecoder
-    
+
     init(
         session: URLSession,
         configuration: Configuration,
@@ -15,7 +15,7 @@ struct URLSessionRequestHandler: RequestHandler {
         self.configuration = configuration
         self.decoder = decoder
     }
-    
+
     func perform<T>(request: Request) async throws -> T where T : Decodable {
         let urlRequest = try makeUrlRequest(request: request)
         let (data, _) = try await session.data(for: urlRequest)
@@ -27,7 +27,7 @@ struct URLSessionRequestHandler: RequestHandler {
             throw try decoder.decode(APIErrorResponse.self, from: data)
         }
     }
-    
+
     func stream<T>(request: Request) async throws -> AsyncThrowingStream<T, Error> where T : Decodable & Sendable {
         let urlRequest = try makeUrlRequest(request: request)
         let finalRequest: URLRequest = {
@@ -35,24 +35,22 @@ struct URLSessionRequestHandler: RequestHandler {
             request.timeoutInterval = 25
             return request
         }()
-        
-        // Use a local decoder to avoid crossing concurrency domains with self.decoder
-        let localDecoder = JSONDecoder()
-        localDecoder.keyDecodingStrategy = request.keyDecodingStrategy
-        localDecoder.dateDecodingStrategy = request.dateDecodingStrategy
-        
-        return AsyncThrowingStream<T, Error> { @Sendable [localDecoder] continuation in
+
+        decoder.keyDecodingStrategy = request.keyDecodingStrategy
+        decoder.dateDecodingStrategy = request.dateDecodingStrategy
+
+        return AsyncThrowingStream<T, Error> { @Sendable continuation in
             Task(priority: .userInitiated) {
                 do {
                     let (bytes, _) = try await session.bytes(for: finalRequest)
                     for try await buffer in bytes.lines {
                         let components = buffer.components(separatedBy: "data: ")
                             .filter { $0 != "data: " }
-                        // Process sequentially to keep ordering and avoid data races
+
                         for component in components {
                             guard let data = component.data(using: .utf8),
-                                  let value = try? localDecoder.decode(T.self, from: data) else {
-                                continue
+                                  let value = try? self.decoder.decode(T.self, from: data) else {
+                                return
                             }
                             continuation.yield(value)
                         }
@@ -64,7 +62,7 @@ struct URLSessionRequestHandler: RequestHandler {
             }
         }
     }
-    
+
     private func makeUrlRequest(request: Request) throws -> URLRequest {
         let urlString = try request.generateURL(configuration)
         guard let url = URL(string: urlString) else {
