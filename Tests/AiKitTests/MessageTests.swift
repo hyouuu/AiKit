@@ -66,6 +66,8 @@ final class MessageTests: XCTestCase {
             XCTFail("incorrect role")
         case .user(let content):
             XCTAssertEqual(content, "Translate the following English text to French: ")
+        case .userMultipart:
+            XCTFail("incorrect role")
         case .assistant(_):
             XCTFail("incorrect role")
         }
@@ -84,6 +86,8 @@ final class MessageTests: XCTestCase {
             }
             XCTAssertEqual(content, original)
         case .user(_):
+            XCTFail("incorrect role")
+        case .userMultipart:
             XCTFail("incorrect role")
         case .assistant(_):
             XCTFail("incorrect role")
@@ -124,11 +128,50 @@ final class MessageTests: XCTestCase {
             XCTFail()
         case .assistant(let content):
             XCTAssertEqual(content, "The 2020 World Series was played in Arlington, Texas at the Globe Life Field, which was the new home stadium for the Texas Rangers.")
-        case .user(_):
+        case .user(_), .userMultipart:
             XCTFail()
         }
     }
     
+    func testUserWithImageURLEncoding() throws {
+        let message = Chat.Message.user(
+            content: "What's in this image?",
+            imageURLs: ["https://example.com/cat.png"]
+        )
+        let data = try encoder.encode(message)
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+
+        XCTAssertEqual(json?["role"] as? String, "user")
+        let parts = json?["content"] as? [[String: Any]]
+        XCTAssertEqual(parts?.count, 2)
+        XCTAssertEqual(parts?[0]["type"] as? String, "text")
+        XCTAssertEqual(parts?[0]["text"] as? String, "What's in this image?")
+        XCTAssertEqual(parts?[1]["type"] as? String, "image_url")
+        let imageURL = parts?[1]["image_url"] as? [String: Any]
+        XCTAssertEqual(imageURL?["url"] as? String, "https://example.com/cat.png")
+        XCTAssertEqual(imageURL?["detail"] as? String, "auto")
+    }
+
+    func testUserWithImageDataEncoding() throws {
+        let bytes = Data([0xFF, 0xD8, 0xFF, 0xE0])
+        let message = Chat.Message.user(
+            content: "Describe",
+            imageData: bytes,
+            mimeType: "image/jpeg",
+            detail: .high
+        )
+        let data = try encoder.encode(message)
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+
+        let parts = json?["content"] as? [[String: Any]]
+        let imageURL = parts?[1]["image_url"] as? [String: Any]
+        XCTAssertEqual(
+            imageURL?["url"] as? String,
+            "data:image/jpeg;base64,\(bytes.base64EncodedString())"
+        )
+        XCTAssertEqual(imageURL?["detail"] as? String, "high")
+    }
+
     func testChatRequest() throws {
         let request = try CreateChatRequest(
             model: "gpt-3.5-turbo", //.gpt3_5Turbo,
