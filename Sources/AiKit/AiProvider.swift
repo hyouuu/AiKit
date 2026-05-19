@@ -28,10 +28,10 @@ public enum AiProvider: String, Sendable {
 
     public var reasoningModel: ModelId {
         switch self {
-            case .openAI: Model.openAI.gpt
-            case .xAI: Model.xAI.grok
-            case .deepSeek: Model.deepSeek.reasoner
-//            case .google: Model.deepSeek.reasoner
+            case .openAI: Model.openAI.gptMini
+            case .xAI: Model.xAI.grokReasoner
+            case .deepSeek: Model.deepSeek.chat
+//            case .google: Model.deepSeek.chat
         }
     }
 }

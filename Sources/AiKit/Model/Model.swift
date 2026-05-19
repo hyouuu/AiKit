@@ -36,23 +36,30 @@ public protocol ModelId: Sendable {
 
 extension Model {
     public enum xAI: String, ModelId {
-        // https://docs.x.ai/docs/models
-        case grok = "grok-3-mini"
+        // https://docs.x.ai/developers/models
+        // https://docs.x.ai/developers/pricing
+        // grok-3-mini and grok-4* fast/code variants retired on 2026-05-15.
+        // Both models below: $1.25 / 1M input, $2.50 / 1M output.
+        case grok = "grok-4.20-non-reasoning" // 2M context, non-reasoning chat workloads
+        case grokReasoner = "grok-4.3"        // 1M context, supports low/medium/high reasoning effort
     }
 
     public enum openAI: String, ModelId {
-        // Starting from gpt-5-mini, need to migrate using:
-        // https://platform.openai.com/docs/guides/migrate-to-responses
-
         // https://platform.openai.com/docs/pricing
-        // https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat
-        case gpt = "gpt-4.1-mini"
+        // Note: the gpt-5 family is optimized for the Responses API:
+        // https://platform.openai.com/docs/guides/migrate-to-responses
+        case gpt = "gpt-5-nano"          // cheapest: $0.05 / 1M input, $0.40 / 1M output
+        case gptMini = "gpt-5-mini"      // mid-tier: $0.25 / 1M input, $2.00 / 1M output
+        case gpt41Nano = "gpt-4.1-nano"  // Chat-Completions-friendly: $0.10 / 1M input, $0.40 / 1M output
     }
 
     public enum deepSeek: String, ModelId {
         // https://api-docs.deepseek.com/quick_start/pricing
-        case chat = "deepseek-chat"
-        case reasoner = "deepseek-reasoner"
+        // Legacy ids `deepseek-chat` / `deepseek-reasoner` are deprecated and
+        // will stop working after 2026-07-24. V4 unifies thinking and
+        // non-thinking modes under a single model id (toggled via API param).
+        case chat = "deepseek-v4-flash" // $0.14 / 1M input (cache miss), $0.28 / 1M output
+        case pro = "deepseek-v4-pro"    // $0.435 / $0.87 (promo until 2026-05-31), $1.74 / $3.48 standard
     }
 
     // Used for edits etc 
