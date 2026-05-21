@@ -94,12 +94,12 @@ struct NIORequestHandler: RequestHandler {
         return AsyncThrowingStream<T, Error> { @Sendable continuation in
             Task(priority: .userInitiated) {
                 do {
-                    for try await buffer in response.body {
-                        let components = String(buffer: buffer)
-                            .components(separatedBy: "data: ")
-                            .filter { $0 != "data: " }
+                    var leftover = Data()
 
-                        // Process components sequentially to maintain order
+                    func processLine(_ lineData: Data) {
+                        guard let line = String(data: lineData, encoding: .utf8) else { return }
+                        let components = line.components(separatedBy: "data: ")
+                            .filter { $0 != "data: " }
                         for component in components {
                             guard let data = component.data(using: .utf8),
                                   let value = try? self.decoder.decode(T.self, from: data) else {
@@ -107,6 +107,20 @@ struct NIORequestHandler: RequestHandler {
                             }
                             continuation.yield(value)
                         }
+                    }
+
+                    for try await buffer in response.body {
+                        leftover.append(Data(buffer: buffer))
+
+                        while let nlIdx = leftover.firstIndex(of: 0x0A) {
+                            let lineData = leftover.subdata(in: leftover.startIndex..<nlIdx)
+                            leftover.removeSubrange(leftover.startIndex...nlIdx)
+                            processLine(lineData)
+                        }
+                    }
+
+                    if !leftover.isEmpty {
+                        processLine(leftover)
                     }
                     continuation.finish()
                 } catch {
