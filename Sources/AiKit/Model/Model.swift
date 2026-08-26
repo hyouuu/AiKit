@@ -62,6 +62,16 @@ extension Model {
         case pro = "deepseek-v4-pro"    // $0.435 / $0.87 (promo until 2026-05-31), $1.74 / $3.48 standard
     }
 
+    public enum anthropic: String, ModelId {
+        // https://platform.claude.com/docs/en/about-claude/pricing
+        // Served via Anthropic's OpenAI-compatible layer at /v1/chat/completions
+        // (Authorization: Bearer, SSE streaming supported). Caveats: n must be 1,
+        // temperature capped at 1, presence/frequency penalties and logit_bias ignored.
+        case haiku = "claude-haiku-4-5"   // $1 / 1M input, $5 / 1M output, 200K context
+        case sonnet = "claude-sonnet-5"   // $2 / 1M input, $10 / 1M output, 1M context
+        case opus = "claude-opus-5"       // $5 / 1M input, $25 / 1M output, 1M context
+    }
+
     // Used for edits etc 
     public enum GPT3: String, ModelId {
         case gpt3_5Turbo = "gpt-3.5-turbo"
