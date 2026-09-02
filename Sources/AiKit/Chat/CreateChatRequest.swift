@@ -19,7 +19,8 @@ struct CreateChatRequest: Request {
         presencePenalty: Double?,
         frequencyPenalty: Double?,
         logitBias: [String: Int],
-        user: String?
+        user: String?,
+        reasoningEffort: ReasoningEffort? = nil
     ) throws {
         
         let body = Body(
@@ -34,7 +35,8 @@ struct CreateChatRequest: Request {
             presencePenalty: presencePenalty,
             frequencyPenalty: frequencyPenalty,
             logitBias: logitBias,
-            user: user
+            user: user,
+            reasoningEffort: reasoningEffort
         )
                 
         self.body = try Self.encoder.encode(body)
@@ -55,6 +57,7 @@ extension CreateChatRequest {
         let frequencyPenalty: Double?
         let logitBias: [String: Int]
         let user: String?
+        let reasoningEffort: ReasoningEffort?
             
         enum CodingKeys: CodingKey {
             case model
@@ -69,6 +72,7 @@ extension CreateChatRequest {
             case frequencyPenalty
             case logitBias
             case user
+            case reasoningEffort
         }
         
         func encode(to encoder: Encoder) throws {
@@ -111,6 +115,18 @@ extension CreateChatRequest {
             }
             
             try container.encodeIfPresent(user, forKey: .user)
+            try container.encodeIfPresent(reasoningEffort, forKey: .reasoningEffort)
         }
     }
+}
+
+/// How much hidden reasoning a reasoning model (gpt-5 family, grok reasoner,
+/// o-series) does before answering. Lower effort means the first visible
+/// token arrives sooner and costs less. `minimal` is OpenAI gpt-5 only;
+/// xAI accepts `low`/`high`.
+public enum ReasoningEffort: String, Encodable, Sendable {
+    case minimal
+    case low
+    case medium
+    case high
 }
