@@ -46,11 +46,18 @@ extension Model {
 
     public enum openAI: String, ModelId {
         // https://platform.openai.com/docs/pricing
-        // Note: the gpt-5 family is optimized for the Responses API:
-        // https://platform.openai.com/docs/guides/migrate-to-responses
-        case gpt = "gpt-5-nano"          // cheapest: $0.05 / 1M input, $0.40 / 1M output
-        case gptMini = "gpt-5-mini"      // mid-tier: $0.25 / 1M input, $2.00 / 1M output
-        case gpt41Nano = "gpt-4.1-nano"  // Chat-Completions-friendly: $0.10 / 1M input, $0.40 / 1M output
+        // GPT-5.6 family (2026-06-25): 1M context, 128K output, knowledge cutoff
+        // 2026-02-16. Every model is reasoning-capable; pass reasoning_effort
+        // "none" for classic low-latency chat behaviour (no reasoning tokens).
+        case luna = "gpt-5.6-luna"       // nano tier: $0.20 / 1M input, $1.20 / 1M output
+        case terra = "gpt-5.6-terra"     // mini tier: $2.00 / 1M input, $12.00 / 1M output
+        case sol = "gpt-5.6-sol"         // flagship: $4.00 / 1M input, $20.00 / 1M output (promo)
+
+        // Original gpt-5 family. Dated snapshots shut down 2026-12-11; only
+        // support reasoning_effort down to "minimal", never "none".
+        case gpt = "gpt-5-nano"          // $0.05 / 1M input, $0.40 / 1M output
+        case gptMini = "gpt-5-mini"      // $0.25 / 1M input, $2.00 / 1M output
+        case gpt41Nano = "gpt-4.1-nano"  // shuts down 2026-10-23
     }
 
     public enum deepSeek: String, ModelId {

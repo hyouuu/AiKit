@@ -122,9 +122,13 @@ extension CreateChatRequest {
 
 /// How much hidden reasoning a reasoning model (gpt-5 family, grok reasoner,
 /// o-series) does before answering. Lower effort means the first visible
-/// token arrives sooner and costs less. `minimal` is OpenAI gpt-5 only;
-/// xAI accepts `low`/`high`.
+/// token arrives sooner and costs less.
+/// - `off` (wire value "none") disables reasoning tokens entirely; supported
+///   on gpt-5.1 and later, the replacement for classic non-reasoning models.
+/// - `minimal` is the floor for the original gpt-5 family (nano/mini/gpt).
+/// - xAI reasoners accept `low`/`high`.
 public enum ReasoningEffort: String, Encodable, Sendable {
+    case off = "none"
     case minimal
     case low
     case medium
