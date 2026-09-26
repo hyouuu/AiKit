@@ -20,7 +20,9 @@ struct CreateChatRequest: Request {
         frequencyPenalty: Double?,
         logitBias: [String: Int],
         user: String?,
-        reasoningEffort: ReasoningEffort? = nil
+        reasoningEffort: ReasoningEffort? = nil,
+        promptCacheKey: String? = nil,
+        promptCacheRetention: PromptCacheRetention? = nil
     ) throws {
         
         let body = Body(
@@ -36,7 +38,9 @@ struct CreateChatRequest: Request {
             frequencyPenalty: frequencyPenalty,
             logitBias: logitBias,
             user: user,
-            reasoningEffort: reasoningEffort
+            reasoningEffort: reasoningEffort,
+            promptCacheKey: promptCacheKey,
+            promptCacheRetention: promptCacheRetention
         )
                 
         self.body = try Self.encoder.encode(body)
@@ -58,6 +62,8 @@ extension CreateChatRequest {
         let logitBias: [String: Int]
         let user: String?
         let reasoningEffort: ReasoningEffort?
+        let promptCacheKey: String?
+        let promptCacheRetention: PromptCacheRetention?
             
         enum CodingKeys: CodingKey {
             case model
@@ -73,6 +79,8 @@ extension CreateChatRequest {
             case logitBias
             case user
             case reasoningEffort
+            case promptCacheKey
+            case promptCacheRetention
         }
         
         func encode(to encoder: Encoder) throws {
@@ -116,6 +124,8 @@ extension CreateChatRequest {
             
             try container.encodeIfPresent(user, forKey: .user)
             try container.encodeIfPresent(reasoningEffort, forKey: .reasoningEffort)
+            try container.encodeIfPresent(promptCacheKey, forKey: .promptCacheKey)
+            try container.encodeIfPresent(promptCacheRetention, forKey: .promptCacheRetention)
         }
     }
 }
@@ -133,4 +143,12 @@ public enum ReasoningEffort: String, Encodable, Sendable {
     case low
     case medium
     case high
+}
+
+/// OpenAI prompt cache lifetime. Caching itself is automatic for prompts of
+/// 1024+ tokens; `extended` keeps cached prefixes up to 24h instead of a few
+/// minutes. OpenAI-only: other providers may reject the field.
+public enum PromptCacheRetention: String, Encodable, Sendable {
+    case inMemory = "in_memory"
+    case extended = "24h"
 }
