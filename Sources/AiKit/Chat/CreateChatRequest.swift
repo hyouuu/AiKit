@@ -16,6 +16,7 @@ struct CreateChatRequest: Request {
         stream: Bool,
         stops: [String],
         maxTokens: Int?,
+        maxCompletionTokens: Int? = nil,
         presencePenalty: Double?,
         frequencyPenalty: Double?,
         logitBias: [String: Int],
@@ -34,6 +35,7 @@ struct CreateChatRequest: Request {
             stream: stream,
             stops: stops,
             maxTokens: maxTokens,
+            maxCompletionTokens: maxCompletionTokens,
             presencePenalty: presencePenalty,
             frequencyPenalty: frequencyPenalty,
             logitBias: logitBias,
@@ -57,6 +59,8 @@ extension CreateChatRequest {
         let stream: Bool
         let stops: [String]
         let maxTokens: Int?
+        /// OpenAI gpt-5 / o-series reject `max_tokens` and want this instead.
+        let maxCompletionTokens: Int?
         let presencePenalty: Double?
         let frequencyPenalty: Double?
         let logitBias: [String: Int]
@@ -74,6 +78,7 @@ extension CreateChatRequest {
             case stream
             case stop
             case maxTokens
+            case maxCompletionTokens
             case presencePenalty
             case frequencyPenalty
             case logitBias
@@ -108,6 +113,9 @@ extension CreateChatRequest {
             
             if let maxTokens {
                 try container.encode(maxTokens, forKey: .maxTokens)
+            }
+            if let maxCompletionTokens {
+                try container.encode(maxCompletionTokens, forKey: .maxCompletionTokens)
             }
 
             if let presencePenalty {

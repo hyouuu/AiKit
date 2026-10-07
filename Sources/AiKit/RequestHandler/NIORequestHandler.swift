@@ -92,7 +92,7 @@ struct NIORequestHandler: RequestHandler {
         let response = try await httpClient.execute(httpClientRequest, timeout: .seconds(25))
 
         return AsyncThrowingStream<T, Error> { @Sendable continuation in
-            Task(priority: .userInitiated) {
+            let task = Task(priority: .userInitiated) {
                 do {
                     var leftover = Data()
 
@@ -110,6 +110,7 @@ struct NIORequestHandler: RequestHandler {
                     }
 
                     for try await buffer in response.body {
+                        try Task.checkCancellation()
                         leftover.append(Data(buffer: buffer))
 
                         while let nlIdx = leftover.firstIndex(of: 0x0A) {
@@ -123,9 +124,14 @@ struct NIORequestHandler: RequestHandler {
                         processLine(leftover)
                     }
                     continuation.finish()
+                } catch is CancellationError {
+                    continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)
                 }
+            }
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
             }
         }
     }
