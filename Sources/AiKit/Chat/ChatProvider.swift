@@ -83,7 +83,8 @@ public struct ChatProvider: Sendable {
         user: String? = nil,
         reasoningEffort: ReasoningEffort? = nil,
         promptCacheKey: String? = nil,
-        promptCacheRetention: PromptCacheRetention? = nil
+        promptCacheRetention: PromptCacheRetention? = nil,
+        includeUsage: Bool = false
     ) async throws -> AsyncThrowingStream<ChatStream, Error> {
         
         let request = try CreateChatRequest(
@@ -102,7 +103,8 @@ public struct ChatProvider: Sendable {
             user: user,
             reasoningEffort: reasoningEffort,
             promptCacheKey: promptCacheKey,
-            promptCacheRetention: promptCacheRetention
+            promptCacheRetention: promptCacheRetention,
+            includeUsage: includeUsage
         )
     
         return try await requestHandler.stream(request: request)

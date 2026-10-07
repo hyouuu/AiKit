@@ -23,7 +23,8 @@ struct CreateChatRequest: Request {
         user: String?,
         reasoningEffort: ReasoningEffort? = nil,
         promptCacheKey: String? = nil,
-        promptCacheRetention: PromptCacheRetention? = nil
+        promptCacheRetention: PromptCacheRetention? = nil,
+        includeUsage: Bool = false
     ) throws {
         
         let body = Body(
@@ -42,7 +43,8 @@ struct CreateChatRequest: Request {
             user: user,
             reasoningEffort: reasoningEffort,
             promptCacheKey: promptCacheKey,
-            promptCacheRetention: promptCacheRetention
+            promptCacheRetention: promptCacheRetention,
+            streamOptions: stream && includeUsage ? StreamOptions(includeUsage: true) : nil
         )
                 
         self.body = try Self.encoder.encode(body)
@@ -68,6 +70,7 @@ extension CreateChatRequest {
         let reasoningEffort: ReasoningEffort?
         let promptCacheKey: String?
         let promptCacheRetention: PromptCacheRetention?
+        let streamOptions: StreamOptions?
             
         enum CodingKeys: CodingKey {
             case model
@@ -86,6 +89,7 @@ extension CreateChatRequest {
             case reasoningEffort
             case promptCacheKey
             case promptCacheRetention
+            case streamOptions
         }
         
         func encode(to encoder: Encoder) throws {
@@ -134,7 +138,12 @@ extension CreateChatRequest {
             try container.encodeIfPresent(reasoningEffort, forKey: .reasoningEffort)
             try container.encodeIfPresent(promptCacheKey, forKey: .promptCacheKey)
             try container.encodeIfPresent(promptCacheRetention, forKey: .promptCacheRetention)
+            try container.encodeIfPresent(streamOptions, forKey: .streamOptions)
         }
+    }
+
+    struct StreamOptions: Encodable {
+        let includeUsage: Bool
     }
 }
 

@@ -6,6 +6,8 @@ public struct ChatStream: Codable, Sendable {
     public let created: Date
     public let model: String
     public let choices: [ChatStream.Choice]
+    /// Present on the final chunk when the request set `includeUsage`.
+    public let usage: Usage?
 }
 
 extension ChatStream {

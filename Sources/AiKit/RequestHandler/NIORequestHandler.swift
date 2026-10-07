@@ -52,9 +52,14 @@ struct NIORequestHandler: RequestHandler {
                 method: request.method,
                 headers: headers,
                 body: body
-            )
+            ),
+            deadline: .now() + .seconds(180)
         ).get()
 
+        guard (200..<300).contains(response.status.code) else {
+            let errorBody = response.body.map { String(buffer: $0) } ?? ""
+            throw ProviderHTTPError(status: Int(response.status.code), body: errorBody)
+        }
 
         guard let byteBuffer = response.body else {
             throw RequestHandlerError.responseBodyMissing
@@ -90,6 +95,11 @@ struct NIORequestHandler: RequestHandler {
         decoder.dateDecodingStrategy = request.dateDecodingStrategy
 
         let response = try await httpClient.execute(httpClientRequest, timeout: .seconds(25))
+
+        guard (200..<300).contains(response.status.code) else {
+            let errorBody = (try? await response.body.collect(upTo: 64 * 1024)).map { String(buffer: $0) } ?? ""
+            throw ProviderHTTPError(status: Int(response.status.code), body: errorBody)
+        }
 
         return AsyncThrowingStream<T, Error> { @Sendable continuation in
             let task = Task(priority: .userInitiated) {
